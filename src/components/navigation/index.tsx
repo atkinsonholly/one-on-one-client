@@ -12,9 +12,10 @@ const Navigation: React.FC = () => {
       height="60px"
       fontSize="18px"
       fontFamily="accent"
+      bg="grey" 
     >
       
-      <Box >
+      <Box>
         <Text fontFamily="alt" fontSize="18px" color="blue" >
           Chat one-on-one with your AI-infused NFT. gm, NFT! How are you feeling today?
         </Text>
