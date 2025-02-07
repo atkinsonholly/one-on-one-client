@@ -1,13 +1,15 @@
 import React, {useEffect, useState, useMemo } from "react";
 import { Text, Box, VStack, Spacer, HStack, Image } from "@chakra-ui/react";
 import WagmiConnect from "./WagmiConnect";
-import Chat from "./Chat";
+import NFT from "./NFT";
 import { useAccount, useReadContracts } from 'wagmi';
 import { nftAbi } from './nftAbi';
 
 const Hero: React.FC = () => {
     const { isConnected, address } = useAccount()
-    const [id, setId] = useState<String>("0")
+    const [id, setId] = useState<string>("0")
+    const [balance, setBalance] = useState<string>("0")
+    
     
     const contract = {
         address: '',
@@ -56,22 +58,7 @@ const Hero: React.FC = () => {
             <WagmiConnect/>
           </Box>
         </Box>
-        <HStack justifyContent="space-between" alignItems="flex-start">
-          <Box width="400px" display="flex">
-            {
-              // TODO fetch user's NFT image and replace the placeholder
-            }
-            <Image src='OneOnOne_square.webp'/>
-          </Box>
-          <Box width="600px">
-            { 
-              // TODO fetch chat in chat component
-              // TODO grey out box if user is not logged in OR if user does not have NFT
-              // TODO show mint button if user is logged in and does not have NFT
-            }
-            <Chat/>
-          </Box>
-        </HStack>
+        <NFT balance={balance} id={id}/>
         <Spacer height="50px"/>
       </VStack>
     </Box>
