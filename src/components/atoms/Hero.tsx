@@ -8,7 +8,7 @@ import { nftAbi } from './nftAbi';
 const Hero: React.FC = () => {
     const { isConnected, address } = useAccount()
     const [id, setId] = useState<string>("0")
-    const [balance, setBalance] = useState<string>("0")
+    const [balance, setBalance] = useState<string>("1")
     
     
     const contract = {
@@ -58,7 +58,7 @@ const Hero: React.FC = () => {
             <WagmiConnect/>
           </Box>
         </Box>
-        <NFT balance={balance} id={id}/>
+        {isConnected ? <NFT balance={balance} id={id}/> : null}
         <Spacer height="50px"/>
       </VStack>
     </Box>
