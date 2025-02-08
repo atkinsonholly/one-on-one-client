@@ -156,7 +156,7 @@ const Hero: React.FC = () => {
           </Box>
         </Box>
         {isConnected ? <NFT balance={balance} id={id}/> : null}
-        {isConnected && isLoggedIn && !isSignedIn ? <Button suppressHydrationWarning={true} onClick={() => signInWithEthereum() }>Sign in</Button> : null}
+        {isConnected && isLoggedIn && !isSignedIn ? <Button onClick={() => signInWithEthereum() }>Sign in</Button> : null}
         {isConnected && isSignedIn ? <Text>Connected to AI Agent</Text> : <Text>Agent disconnected</Text>}
         <Spacer height="50px"/>
       </VStack>
