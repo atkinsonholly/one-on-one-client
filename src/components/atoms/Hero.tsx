@@ -3,9 +3,10 @@ import { Text, Box, VStack, Spacer, HStack, Image } from "@chakra-ui/react";
 import WagmiConnect from "./WagmiConnect";
 // import NFT from "./NFT";
 import { abi } from './nftAbi';
-import { useAccount, useChainId, useSignMessage, useReadContract } from 'wagmi'
+import { useAccount, useChainId, useSignMessage, useReadContract, useReadContracts } from 'wagmi'
 import { Button } from "@chakra-ui/react";
 import {SiweMessage} from "siwe";
+import { Address } from 'viem';
 
 import dynamic from 'next/dynamic'
 
@@ -16,7 +17,8 @@ const NFT = dynamic(() => import("@/components/atoms/NFT"));
 const BACKEND_ADDR = process.env.NEXT_PUBLIC_AGENT_URL;
 
 const Hero: React.FC = () => {
-    const { isConnected, address } = useAccount()
+    const { isConnected, userAddress } = useAccount()
+    const [result, setResult] = useState<string>("0")
     const [id, setId] = useState<string>("0")
     const [balance, setBalance] = useState<string>("0")
     // const [isLoggedIn, setLoggedIn] = useState(false);
@@ -28,7 +30,15 @@ const Hero: React.FC = () => {
 
     useEffect(() => {
       
-    }, [isConnected, address, id]);
+    }, [userAddress]);
+    
+    useEffect(() => {
+      setId(result)
+    }, [isConnected]);
+
+    useEffect(() => {
+      setId(result)
+    }, [result]);
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -69,26 +79,43 @@ const Hero: React.FC = () => {
         return message.prepareMessage();
     }
 
-    const loadData = async() => {
-      if (address) {
-        const result = useReadContract({
-        abi,
-        address: '0x65725931bf9d37d7e1b1ceb90928271b572829f4',
-        functionName: 'idOf',
-        args: [
-          address
-        ],
-      })
-      return result;
+    const contractAddress = '0x65725931bf9d37d7e1b1ceb90928271b572829f4'
+
+    const contract = {
+      abi,
+      address: contractAddress as unknown as Address,
     }
 
-    if (isConnected && address != undefined) {
-      loadData().then((result) => {
-        if (result && 'data' in result && result.data !== undefined) {
-          setId(result.data.toString());
-        }
-      }).catch(console.error);
-    }
+    const loadData = async() => {
+ 
+      if (userAddress) {
+        return useReadContracts({
+          contracts: [
+            {
+              ...contract,
+              functionName: 'idOf',
+              args: [userAddress],
+            },
+            {
+              ...contract,
+              functionName: 'balanceOf',
+              args: [userAddress],
+            },
+            {
+              ...contract,
+              functionName: 'tokenURI',
+              args: [BigInt(id)],
+            }]
+        })
+      }
+
+    console.log("loading data")
+    loadData().then((result: any) => {
+      if (result && 'data' in result && result.data !== undefined) {
+        setResult(result.data);
+      }
+    }).catch(console.error);
+    
   }
 
     // useEffect(() => {
