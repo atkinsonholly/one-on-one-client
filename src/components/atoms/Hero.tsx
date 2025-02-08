@@ -69,7 +69,7 @@ const Hero: React.FC = () => {
             statement,
             uri: origin,
             version: '1',
-            chainId,
+            chainId: 8453,
             nonce
         });
         console.log(message);
@@ -102,13 +102,12 @@ const Hero: React.FC = () => {
     useEffect(() => {
         const signIn = async () => {
             try {
-                // // const res = await fetch(`${BACKEND_ADDR}/is-signed-in`, {
-                // //     credentials: 'include',
-                // // });
-                //
-                // // const alreadySignedIn = await res.json();
-                const alreadySignedIn = false;
-                //
+                const res = await fetch(`${BACKEND_ADDR}/is-signed-in`, {
+                    credentials: 'include',
+                });
+
+                const alreadySignedIn = await res.json();
+
                 if (alreadySignedIn) {
                     setSignedIn(true);
                 } else {
@@ -135,10 +134,8 @@ const Hero: React.FC = () => {
         }
     }, [isConnected, isSignedIn]); // Try signing in when user is logged in
 
-    const chainId = useChainId()
-
     const { signMessageAsync } = useSignMessage()
-    const signInWithEthereum = async (): Promise<boolean> => {
+    const signInWithEthereum = async (): Promise<boolean | undefined> => {
         try {
             const message = await createSiweMessage(
                 'Connect with AI Agent',
