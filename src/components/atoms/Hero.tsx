@@ -17,7 +17,7 @@ const NFT = dynamic(() => import("@/components/atoms/NFT"));
 const BACKEND_ADDR = process.env.NEXT_PUBLIC_AGENT_URL;
 
 const Hero: React.FC = () => {
-    const { isConnected, userAddress } = useAccount()
+    const { isConnected, address: userAddress } = useAccount()
     const [result, setResult] = useState<string>("0")
     const [id, setId] = useState<string>("0")
     const [balance, setBalance] = useState<string>("0")
