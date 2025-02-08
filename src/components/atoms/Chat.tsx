@@ -3,6 +3,7 @@ import { Input, Box, Spacer } from "@chakra-ui/react";
 
 interface ChatProps {
     balance: string;
+    id: string;
   }
 
 const Chat: React.FC<ChatProps> = ({ balance, id }) => (
@@ -14,7 +15,7 @@ const Chat: React.FC<ChatProps> = ({ balance, id }) => (
         <Box width="100%" padding="25px" border="dashed" height="500px" overflow="scroll">
             Conversation history
         </Box>
-    </Box> : null 
+    </Box> : null
 );
 
 export default Chat;
