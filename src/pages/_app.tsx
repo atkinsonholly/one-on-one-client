@@ -8,22 +8,33 @@ import Head from "next/head";
 import {
   RainbowKitProvider,
 } from '@rainbow-me/rainbowkit';
+import { getDefaultConfig } from '@rainbow-me/rainbowkit'
 import { createConfig, WagmiProvider, http } from 'wagmi';
 import { base, baseSepolia } from 'wagmi/chains';
 
 import customTheme from "@/styles/theme";
 import Layout from "@/components/layout";
+
 import Loading from "@/components/atoms/Loading";
 
 import type { AppProps } from "next/app";
 
-const config = createConfig({
-  chains: [base, baseSepolia],
+const config = getDefaultConfig({
+  appName: 'OneOnOne',
+  projectId: `${process.env.NEXT_PUBLIC_REOWN_ID}`,
+  chains: [base], 
   transports: {
     [base.id]: http(`https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_BASE_ID}`),
-    [baseSepolia.id]: http(`https://base-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_BASE_ID}`),
   },
-});
+})
+
+// const config = createConfig({
+//   chains: [base, baseSepolia],
+//   transports: {
+//     [base.id]: http(`https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_BASE_ID}`),
+//     [baseSepolia.id]: http(`https://base-sepolia.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_BASE_ID}`),
+//   },
+// });
 
 const queryClient = new QueryClient();
 
