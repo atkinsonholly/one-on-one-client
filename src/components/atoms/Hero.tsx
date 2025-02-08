@@ -33,12 +33,12 @@ const Hero: React.FC = () => {
     }, [userAddress]);
     
     useEffect(() => {
-      setId(result)
-    }, [isConnected]);
+      // setId(result.data)
+    }, [result]);
 
     useEffect(() => {
-      setId(result)
-    }, [result]);
+      console.log(result, 'res')
+    }, [isConnected]);
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -87,9 +87,9 @@ const Hero: React.FC = () => {
     }
 
     const loadData = async() => {
- 
+      let res;
       if (userAddress) {
-        return useReadContracts({
+        res = useReadContracts({
           contracts: [
             {
               ...contract,
@@ -108,15 +108,17 @@ const Hero: React.FC = () => {
             }]
         })
       }
+      console.log(res, 'inside')
+      return res;
+    }
 
     console.log("loading data")
     loadData().then((result: any) => {
-      if (result && 'data' in result && result.data !== undefined) {
+      if (result) {
         setResult(result.data);
+        console.log(result, 'result')
       }
     }).catch(console.error);
-    
-  }
 
     // useEffect(() => {
     //     const signIn = async () => {
