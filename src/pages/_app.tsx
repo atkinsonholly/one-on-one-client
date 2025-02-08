@@ -10,7 +10,7 @@ import {
 } from '@rainbow-me/rainbowkit';
 import { getDefaultConfig } from '@rainbow-me/rainbowkit'
 import { createConfig, WagmiProvider, http } from 'wagmi';
-import { base, baseSepolia } from 'wagmi/chains';
+import { base } from 'wagmi/chains';
 
 import customTheme from "@/styles/theme";
 import Layout from "@/components/layout";
