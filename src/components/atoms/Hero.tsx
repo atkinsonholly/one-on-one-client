@@ -2,7 +2,7 @@ import React, {useEffect, useState, useMemo } from "react";
 import { Text, Box, VStack, Spacer, HStack, Image } from "@chakra-ui/react";
 import WagmiConnect from "./WagmiConnect";
 // import NFT from "./NFT";
-import { nftAbi } from './nftAbi';
+import { abi } from './nftAbi';
 import { useAccount, useChainId, useSignMessage, useReadContracts } from 'wagmi'
 import { Button } from "@chakra-ui/react";
 import {SiweMessage} from "siwe";
@@ -24,23 +24,25 @@ const Hero: React.FC = () => {
     const [domain, setDomain] = useState("");
     const [origin, setOrigin] = useState("");
 
+    const chainId = useChainId()
+
     const contract = {
-        address: '',
-        abi: nftAbi,
+        address: '0x65725931BF9d37d7e1b1CEb90928271B572829F4',
+        abi
       }
 
     let contractReadData: any
     let isContractReadsLoading: any
 
-    // if (address && address != undefined) {
-    //   const { data, isLoading } = useReadContracts({
-    //     contracts: [
-    //
-    //     ]
-    //   })
-    //   contractReadData = data
-    //   isContractReadsLoading = isLoading
-    // }
+    if (address && address != undefined) {
+      const { data, isLoading } = useReadContracts({
+        contracts: [
+    
+        ]
+      })
+      contractReadData = data
+      isContractReadsLoading = isLoading
+    }
 
     async function sendForVerification(message: string, signature: string): Promise<boolean> {
         const res = await fetch(`${BACKEND_ADDR}/verify`, {
@@ -55,8 +57,6 @@ const Hero: React.FC = () => {
     }
 
     async function createSiweMessage(statement: string) {
-        const domain = window.location.host;
-        const origin = window.location.origin;
         const res = await fetch(`${BACKEND_ADDR}/nonce`, {
             credentials: 'include',
         });
@@ -133,6 +133,7 @@ const Hero: React.FC = () => {
                 .catch(console.error);
         }
     }, [isConnected, isSignedIn]); // Try signing in when user is logged in
+
 
     const { signMessageAsync } = useSignMessage()
     const signInWithEthereum = async (): Promise<boolean | undefined> => {
