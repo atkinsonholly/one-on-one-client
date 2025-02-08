@@ -19,6 +19,8 @@ const Hero: React.FC = () => {
     const [balance, setBalance] = useState<string>("0")
     const [isLoggedIn, setLoggedIn] = useState(false);
     const [isSignedIn, setSignedIn] = useState(false);
+    const [domain, setDomain] = useState("");
+    const [origin, setOrigin] = useState("");
 
     const contract = {
         address: '',
@@ -53,7 +55,7 @@ const Hero: React.FC = () => {
         return await res.json();
     }
 
-    async function createSiweMessage(statement: string, chainId: number, address: string) {
+    async function createSiweMessage(statement: string) {
         const domain = window.location.host;
         const origin = window.location.origin;
         const res = await fetch(`${BACKEND_ADDR}/nonce`, {
@@ -91,6 +93,13 @@ const Hero: React.FC = () => {
       useReadContracts
     }, [isConnected, address, isLoading]);
 
+     useEffect(() => {
+          if (typeof window !== "undefined") {
+            setDomain(window.location.host);
+            setOrigin(window.location.origin);
+          }
+        }, []);
+
     useEffect(() => {
         const checkLoggedIn = async () => {
           try {
@@ -106,6 +115,10 @@ const Hero: React.FC = () => {
           .catch(console.error);
     }, []);
 
+    useEffect(() => {
+            
+        }, [isLoggedIn]); // Try signing in when user is logged in
+
     const chainId = useChainId()
 
     const { signMessageAsync } = useSignMessage()
@@ -113,9 +126,6 @@ const Hero: React.FC = () => {
         try {
             const message = await createSiweMessage(
                 'Connect with AI Agent',
-                chainId,
-                // @ts-ignore
-                address
             );
             console.log(message);
             const signature = await signMessageAsync({
@@ -131,30 +141,6 @@ const Hero: React.FC = () => {
             console.error(e);
         }
     };
-            // signInWithEthereum()
-
-    //
-    // useEffect(() => {
-    //     const signInWithEthereum = async () => {
-    //         try {
-    //             const message = await createSiweMessage(
-    //                 'Connect with AI Agent'
-    //             );
-    //             console.log(message);
-    //             const signature = await signMessageAsync({
-    //                 message,
-    //             })
-    //             console.log(signature);
-    //
-    //             const success = await sendForVerification(message, signature);
-    //             setSignedIn(success) // TODO: check if success is true
-    //         } catch (e) {
-    //             console.error(e);
-    //         }
-    //     }
-    //     signInWithEthereum()
-    //       .catch(console.error);
-    // }, [isLoggedIn]); // Try signing in when user is logged in
 
   return (
     <Box bg="grey" width="100%" bgPosition="center" bgRepeat="no-repeat" backgroundSize="cover" display='flex' flexDirection="column" alignItems="center" margin="auto">
@@ -170,7 +156,7 @@ const Hero: React.FC = () => {
           </Box>
         </Box>
         {isConnected ? <NFT balance={balance} id={id}/> : null}
-        {isConnected && !isSignedIn ? <Button onClick={signInWithEthereum}>Sign in</Button> : null}
+        {isConnected && isLoggedIn && !isSignedIn ? <Button suppressHydrationWarning={true} onClick={() => signInWithEthereum() }>Sign in</Button> : null}
         {isConnected && isSignedIn ? <Text>Connected to AI Agent</Text> : <Text>Agent disconnected</Text>}
         <Spacer height="50px"/>
       </VStack>
