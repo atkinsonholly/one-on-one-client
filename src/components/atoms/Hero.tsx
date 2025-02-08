@@ -13,6 +13,8 @@ import dynamic from 'next/dynamic'
 // const SignIn = dynamic(() => import("@/components/atoms/SignIn"));
 const NFT = dynamic(() => import("@/components/atoms/NFT"));
 
+const BACKEND_ADDR = process.env.NEXT_PUBLIC_AGENT_URL;
+
 const Hero: React.FC = () => {
     const { isConnected, address } = useAccount()
     const [id, setId] = useState<string>("0")
@@ -40,10 +42,7 @@ const Hero: React.FC = () => {
     //   isContractReadsLoading = isLoading
     // }
 
-    // TODO: move to config
-    const BACKEND_ADDR = "http://localhost:3000";
-
-    async function sendForVerification(message: string, signature: string) {
+    async function sendForVerification(message: string, signature: string): Promise<boolean> {
         const res = await fetch(`${BACKEND_ADDR}/verify`, {
             method: "POST",
             headers: {
@@ -52,7 +51,7 @@ const Hero: React.FC = () => {
             body: JSON.stringify({ message, signature }),
             credentials: 'include',
         });
-        return await res.json();
+        return await res.json() as boolean;
     }
 
     async function createSiweMessage(statement: string) {
@@ -101,28 +100,45 @@ const Hero: React.FC = () => {
         }, []);
 
     useEffect(() => {
-        const checkLoggedIn = async () => {
-          try {
-            const res = await fetch(`${BACKEND_ADDR}/is-signed-in`, {
-                credentials: 'include',
-            });
-            setSignedIn(await res.json());
-          } catch (e) {
-              console.error(e);
-          }
-        }
-        checkLoggedIn()
-          .catch(console.error);
-    }, []);
+        const signIn = async () => {
+            try {
+                // // const res = await fetch(`${BACKEND_ADDR}/is-signed-in`, {
+                // //     credentials: 'include',
+                // // });
+                //
+                // // const alreadySignedIn = await res.json();
+                const alreadySignedIn = false;
+                //
+                if (alreadySignedIn) {
+                    setSignedIn(true);
+                } else {
+                    let success = await signInWithEthereum();
+                    if (success) {
+                        const res = await fetch(`${BACKEND_ADDR}/is-signed-in`, {
+                            credentials: 'include',
+                        });
+                        console.log("signed", res)
+                        setSignedIn(true);
+                    } else {
+                        console.error("Failed to sign in");
+                    }
+                }
 
-    useEffect(() => {
-            
-        }, [isLoggedIn]); // Try signing in when user is logged in
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        if (isConnected && !isSignedIn) {
+            signIn()
+                .catch(console.error);
+        }
+    }, [isConnected, isSignedIn]); // Try signing in when user is logged in
 
     const chainId = useChainId()
 
     const { signMessageAsync } = useSignMessage()
-    const signInWithEthereum = async () => {
+    const signInWithEthereum = async (): Promise<boolean> => {
         try {
             const message = await createSiweMessage(
                 'Connect with AI Agent',
@@ -133,10 +149,7 @@ const Hero: React.FC = () => {
             })
             console.log(signature);
 
-            const success = await sendForVerification(message, signature);
-            console.log("Verification success", success);
-
-            setSignedIn(success) // TODO: check if success is true
+            return await sendForVerification(message, signature);
         } catch (e) {
             console.error(e);
         }
