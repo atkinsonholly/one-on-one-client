@@ -35,7 +35,6 @@ const NFT: React.FC<NFTProps> = ({ balance, id }) => {
         value: parseEther('0.001'),
         chainId,
     })
-    console.log('hi')
   } 
   
 
