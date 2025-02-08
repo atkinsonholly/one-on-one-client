@@ -19,30 +19,23 @@ const Hero: React.FC = () => {
     const { isConnected, address } = useAccount()
     const [id, setId] = useState<string>("0")
     const [balance, setBalance] = useState<string>("0")
-    const [isLoggedIn, setLoggedIn] = useState(false);
-    const [isSignedIn, setSignedIn] = useState(false);
+    // const [isLoggedIn, setLoggedIn] = useState(false);
+    // const [isSignedIn, setSignedIn] = useState(false);
     const [domain, setDomain] = useState("");
     const [origin, setOrigin] = useState("");
 
     const chainId = useChainId()
 
-    const contract = {
-        address: '0x65725931BF9d37d7e1b1CEb90928271B572829F4',
-        abi
-      }
+    useEffect(() => {
+      
+    }, [isConnected, address, id]);
 
-    let contractReadData: any
-    let isContractReadsLoading: any
-
-    if (address && address != undefined) {
-      const { data, isLoading } = useReadContract({
-        abi,
-        address: '0x6b175474e89094c44da98b954eedeac495271d0f',
-        functionName: 'idOf',
-      })
-      contractReadData = data
-      isContractReadsLoading = isLoading
-    }
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+          setDomain(window.location.host);
+          setOrigin(window.location.origin);
+        }
+      }, []);
 
     async function sendForVerification(message: string, signature: string): Promise<boolean> {
         const res = await fetch(`${BACKEND_ADDR}/verify`, {
@@ -76,82 +69,81 @@ const Hero: React.FC = () => {
         return message.prepareMessage();
     }
 
-    useEffect(() => {
-      if (contractReadData != undefined) {
-          if(contractReadData[0]) setId(contractReadData[0].toString())
-      }
-    }, [contractReadData]);
+    const loadData = async() => {
+      if (address) {
+        const result = useReadContract({
+        abi,
+        address: '0x65725931bf9d37d7e1b1ceb90928271b572829f4',
+        functionName: 'idOf',
+        args: [
+          address
+        ],
+      })
+      return result;
+    }
 
-    const isLoading = useMemo(
-      () =>
-        isContractReadsLoading,
-      [isContractReadsLoading],
-    );
-
-    useEffect(() => {
-      useReadContract
-    }, [isConnected, address, isLoading]);
-
-     useEffect(() => {
-          if (typeof window !== "undefined") {
-            setDomain(window.location.host);
-            setOrigin(window.location.origin);
-          }
-        }, []);
-
-    useEffect(() => {
-        const signIn = async () => {
-            try {
-                const res = await fetch(`${BACKEND_ADDR}/is-signed-in`, {
-                    credentials: 'include',
-                });
-
-                const alreadySignedIn = await res.json();
-
-                if (alreadySignedIn) {
-                    setSignedIn(true);
-                } else {
-                    let success = await signInWithEthereum();
-                    if (success) {
-                        const res = await fetch(`${BACKEND_ADDR}/is-signed-in`, {
-                            credentials: 'include',
-                        });
-                        console.log("signed", res)
-                        setSignedIn(true);
-                    } else {
-                        console.error("Failed to sign in");
-                    }
-                }
-
-            } catch (e) {
-                console.error(e);
-            }
+    if (isConnected && address != undefined) {
+      loadData().then((result) => {
+        if (result && 'data' in result && result.data !== undefined) {
+          setId(result.data.toString());
         }
+      }).catch(console.error);
+    }
+  }
 
-        if (isConnected && !isSignedIn) {
-            signIn()
-                .catch(console.error);
-        }
-    }, [isConnected, isSignedIn]); // Try signing in when user is logged in
+    // useEffect(() => {
+    //     const signIn = async () => {
+    //         try {
+    //             const res = await fetch(`${BACKEND_ADDR}/is-signed-in`, {
+    //                 credentials: 'include',
+    //             });
+
+    //             const alreadySignedIn = await res.json();
+
+    //             if (alreadySignedIn) {
+    //                 setSignedIn(true);
+    //             } else {
+    //                 let success = await signInWithEthereum();
+    //                 if (success) {
+    //                     const res = await fetch(`${BACKEND_ADDR}/is-signed-in`, {
+    //                         credentials: 'include',
+    //                     });
+    //                     console.log("signed", res)
+    //                     setSignedIn(true);
+    //                 } else {
+    //                     console.error("Failed to sign in");
+    //                 }
+    //             }
+
+    //         } catch (e) {
+    //             console.error(e);
+    //         }
+    //     }
+
+    //     if (isConnected && !isSignedIn) {
+    //         signIn()
+    //             .catch(console.error);
+    //     }
+    // }, [isConnected, isSignedIn]); // Try signing in when user is logged in
 
 
-    const { signMessageAsync } = useSignMessage()
-    const signInWithEthereum = async (): Promise<boolean | undefined> => {
-        try {
-            const message = await createSiweMessage(
-                'Connect with AI Agent',
-            );
-            console.log(message);
-            const signature = await signMessageAsync({
-                message,
-            })
-            console.log(signature);
+    // const { signMessageAsync } = useSignMessage()
+    // const signInWithEthereum = async (): Promise<boolean | undefined> => {
+    //     try {
+    //         const message = await createSiweMessage(
+    //             'Connect with AI Agent',
+    //         );
+    //         console.log(message);
+    //         const signature = await signMessageAsync({
+    //             message,
+    //         })
+    //         console.log(signature);
 
-            return await sendForVerification(message, signature);
-        } catch (e) {
-            console.error(e);
-        }
-    };
+    //         return await sendForVerification(message, signature);
+    //     } catch (e) {
+    //         console.error(e);
+    //     }
+    // };
 
   return (
     <Box bg="grey" width="100%" bgPosition="center" bgRepeat="no-repeat" backgroundSize="cover" display='flex' flexDirection="column" alignItems="center" margin="auto">
@@ -167,8 +159,8 @@ const Hero: React.FC = () => {
           </Box>
         </Box>
         {isConnected ? <NFT balance={balance} id={id}/> : null}
-        {isConnected && isLoggedIn && !isSignedIn ? <Button onClick={() => signInWithEthereum() }>Sign in</Button> : null}
-        {isConnected && isSignedIn ? <Text>Connected to AI Agent</Text> : <Text>Agent disconnected</Text>}
+        {/* {isConnected && isLoggedIn && !isSignedIn ? <Button onClick={() => signInWithEthereum() }>Sign in</Button> : null} */}
+        {/* {isConnected && isSignedIn ? <Text>Connected to AI Agent</Text> : <Text>Agent disconnected</Text>} */}
         <Spacer height="50px"/>
       </VStack>
     </Box>
