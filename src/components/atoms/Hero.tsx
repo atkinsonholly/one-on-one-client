@@ -3,7 +3,7 @@ import { Text, Box, VStack, Spacer, HStack, Image } from "@chakra-ui/react";
 import WagmiConnect from "./WagmiConnect";
 // import NFT from "./NFT";
 import { abi } from './nftAbi';
-import { useAccount, useChainId, useSignMessage, useReadContracts } from 'wagmi'
+import { useAccount, useChainId, useSignMessage, useReadContract } from 'wagmi'
 import { Button } from "@chakra-ui/react";
 import {SiweMessage} from "siwe";
 
@@ -35,10 +35,10 @@ const Hero: React.FC = () => {
     let isContractReadsLoading: any
 
     if (address && address != undefined) {
-      const { data, isLoading } = useReadContracts({
-        contracts: [
-    
-        ]
+      const { data, isLoading } = useReadContract({
+        abi,
+        address: '0x6b175474e89094c44da98b954eedeac495271d0f',
+        functionName: 'idOf',
       })
       contractReadData = data
       isContractReadsLoading = isLoading
@@ -69,7 +69,7 @@ const Hero: React.FC = () => {
             statement,
             uri: origin,
             version: '1',
-            chainId: 8453,
+            chainId,
             nonce
         });
         console.log(message);
@@ -89,7 +89,7 @@ const Hero: React.FC = () => {
     );
 
     useEffect(() => {
-      useReadContracts
+      useReadContract
     }, [isConnected, address, isLoading]);
 
      useEffect(() => {
