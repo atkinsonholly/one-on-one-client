@@ -3,6 +3,7 @@ import { Input, Box, Spacer, VStack } from "@chakra-ui/react";
 
 interface ChatProps {
     id: number;
+    agent: string;
   }
 
 const Chat: React.FC<ChatProps> = ({ id }) => (

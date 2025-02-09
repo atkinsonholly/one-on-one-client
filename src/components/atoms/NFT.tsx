@@ -6,13 +6,14 @@ import Chat from "./Chat";
 
 interface Metadata {
     name: string;
-    image: string;
+    image: { cachedUrl: ""};
 }
 
 interface NFTProps {
-    balance: number;
-    id: number;
+    balance: BigInt | undefined;
+    id: BigInt | undefined;
     metadata: Metadata;
+    agent: string;
 }
 
 const NFT: React.FC<NFTProps> = (props) => {
@@ -31,6 +32,7 @@ const NFT: React.FC<NFTProps> = (props) => {
     console.log(chainId)
     e.preventDefault()
     console.log(abi)
+    console.log(props.metadata)
     // const formData = new FormData(e.target as HTMLFormElement)
     writeContract({
         abi,
@@ -48,7 +50,7 @@ const NFT: React.FC<NFTProps> = (props) => {
   return (
     <HStack justifyContent="space-between" alignItems="flex-start">
         <VStack minHeight="600px" justify="flex-start">
-            {props.balance == 0 &&
+            {props.balance == BigInt(0) &&
             <form onSubmit={submit}>
             <Button
             color="blue" bg="green" fontSize="18px" fontFamily="alt" width='260px'
@@ -57,7 +59,7 @@ const NFT: React.FC<NFTProps> = (props) => {
             >
             {isPending ? 'Confirming...' : 'Mint NFT'}
             </Button></form>} 
-            {props.balance == 1 && <HStack><Box display="flex" flexFlow="column" alignContent="flex-start"><VStack  ><Text fontSize="md" fontFamily="alt" color="black" textAlign="center">{props.metadata.name}</Text><Image src={props.metadata.image} width="600px"  /></VStack></Box><Chat id={props.id}/></HStack>}
+            {props.balance == BigInt(1) && props.id && <HStack><Box display="flex" flexFlow="column" alignContent="flex-start"><VStack  ><Text fontSize="md" fontFamily="alt" color="black" textAlign="center">{props.metadata.name}</Text><Image src={props.metadata.image.cachedUrl} width="600px"  /></VStack></Box><Chat id={Number(props.id)} agent={props.agent}/></HStack>}
         </VStack>
     </HStack>
   );

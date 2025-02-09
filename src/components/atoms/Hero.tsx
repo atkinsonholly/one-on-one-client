@@ -6,6 +6,7 @@ import WagmiConnect from "./WagmiConnect";
 import { useAccount  } from 'wagmi'
 import {useBalanceOf, useIdOf, useTokenUri} from "../../hooks/useContracts";
 import { useMetadata } from "../../hooks/useMetadata";
+import { useAgent } from "../../hooks/useAgent";
 import { useSignInWithEthereum } from "../../hooks/useSignInWithEthereum";
 
 import dynamic from 'next/dynamic'
@@ -20,7 +21,9 @@ const Hero: React.FC = () => {
     const balance = useBalanceOf(userAddress);
     const tokenUri = useTokenUri(id);
     const metadata = useMetadata(id, userAddress);
-    console.log({id, balance, tokenUri, metadata});
+    const agent = useAgent(id, userAddress)
+
+    console.log({id, balance, tokenUri, metadata, agent});
 
     const isSignedIn = useSignInWithEthereum(isConnected, userAddress);
 
@@ -38,7 +41,7 @@ const Hero: React.FC = () => {
           </Box>
         </Box>
         {isConnected && isSignedIn ? <Text fontSize="lg" fontFamily="alt" color="blue" textAlign="center">Connected to AI Agent</Text> : <Text fontSize="lg" fontFamily="alt" color="blue" textAlign="center">Agent disconnected</Text>}
-        {isConnected ? <NFT balance={balance} id={id} metadata={metadata}/> : null}
+        {isConnected && balance == BigInt(1) ? <NFT balance={balance} id={id} metadata={metadata} agent={agent}/> : null}
         <Spacer height="50px"/>
       </VStack>
     </Box>
