@@ -4,7 +4,7 @@ import { Text, Box, VStack, Spacer, Button } from "@chakra-ui/react";
 import WagmiConnect from "./WagmiConnect";
 // import NFT from "./NFT";
 import { useAccount  } from 'wagmi'
-import { useContracts } from "../../hooks/useContracts";
+import {useBalanceOf, useIdOf, useTokenUri} from "../../hooks/useContracts";
 import { useMetadata } from "../../hooks/useMetadata";
 import { useSignInWithEthereum } from "../../hooks/useSignInWithEthereum";
 
@@ -16,10 +16,14 @@ const NFT = dynamic(() => import("@/components/atoms/NFT"));
 
 const Hero: React.FC = () => {
     const { isConnected, address: userAddress } = useAccount()
-    const [id, setId] = useState<number>(0)
-    const [balance, setBalance] = useState<number>(0)
-    const [url, setUrl] = useState<string>("")
+    // const [id, setId] = useState<number>(0)
+    // const [balance, setBalance] = useState<number>(0)
+    // const [url, setUrl] = useState<string>("")
     const [metadata, setMetadata] = useState<string>("")
+
+    const id = useIdOf(userAddress);
+    const balance = useBalanceOf(userAddress);
+    const tokenUri = useTokenUri(id);
 
     // if (isConnected && userAddress != undefined) {
     //   useContracts({setId, setBalance, setUrl, id, balance, url, userAddress})
