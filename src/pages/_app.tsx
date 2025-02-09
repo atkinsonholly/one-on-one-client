@@ -22,7 +22,7 @@ import type { AppProps } from "next/app";
 const config = getDefaultConfig({
   appName: 'OneOnOne',
   projectId: `${process.env.NEXT_PUBLIC_REOWN_ID}`,
-  chains: [base], 
+  chains: [base],
   transports: {
     [base.id]: http(`https://base-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_BASE_ID}`),
   },
@@ -54,7 +54,7 @@ const ClientApp = ({ Component, pageProps }: AppProps) => {
     router.events.on("routeChangeComplete", handleComplete);
     router.events.on("routeChangeError", handleComplete);
   }, [router]);
-  
+
   return (
     <WagmiProvider config={config}>
       <QueryClientProvider client={queryClient}>
