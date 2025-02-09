@@ -17,7 +17,7 @@ const customTheme = extendTheme({
     dark_yellow: "#daac5c",
     blue: "#0a2ab3",
     green: "#08e0a0",
-    grey:"#edf2f6",
+    grey:"#e2e2e2",
     black:"#000000"
    
   },
