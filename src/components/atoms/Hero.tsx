@@ -2,12 +2,10 @@ import React, { useEffect, useState } from "react";
 import { Text, Box, VStack, Spacer } from "@chakra-ui/react";
 import WagmiConnect from "./WagmiConnect";
 // import NFT from "./NFT";
-import { abi } from './nftAbi';
-import { useAccount, useChainId, useSignMessage, useReadContract, useReadContracts } from 'wagmi'
-import { Button } from "@chakra-ui/react";
-import {SiweMessage} from "siwe";
-import { Address } from 'viem';
+import { useAccount, useChainId  } from 'wagmi'
 import { useContracts } from "../../hooks/useContracts";
+import { useMetadata } from "../../hooks/useMetadata";
+import { useSignInWithEthereum } from "../../hooks/useSignInWithEthereum";
 
 import dynamic from 'next/dynamic'
 
@@ -25,13 +23,21 @@ const Hero: React.FC = () => {
     const [id, setId] = useState<number>(0)
     const [balance, setBalance] = useState<number>(0)
     const [url, setUrl] = useState<string>("")
+    const [metadata, setMetadata] = useState<string>("")
 
     const chainId = useChainId()
-    useContracts({setId, setBalance, setUrl, id, balance, url})
+    if (isConnected && userAddress != undefined) {
+      useContracts({setId, setBalance, setUrl, id, balance, url, userAddress})
+      useMetadata({setMetadata, id, userAddress})
+    }
 
     useEffect(() => {
       
-    }, [isConnected, userAddress, id, balance, url]);
+    }, [[isConnected, userAddress]]);
+
+    useEffect(() => {
+      
+    }, [[id, balance, url, metadata]]);
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -40,7 +46,10 @@ const Hero: React.FC = () => {
         }
       }, []);
 
+    
+
     useEffect(() => {
+      if (domain != "" && origin != "" && chainId != undefined && userAddress != undefined) {
         const signIn = async () => {
             try {
                 const res = await fetch(`${BACKEND_ADDR}/is-signed-in`, {
@@ -69,61 +78,16 @@ const Hero: React.FC = () => {
             }
         }
 
-        if (isConnected && !isSignedIn) {
+        if (isConnected && !isSignedIn && userAddress != undefined) {
             signIn()
                 .catch(console.error);
         }
-    }, [isConnected, isSignedIn]); // Try signing in when user is logged in
-
-    async function sendForVerification(message: string, signature: string): Promise<boolean> {
-      const res = await fetch(`${BACKEND_ADDR}/verify`, {
-          method: "POST",
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ message, signature }),
-          credentials: 'include',
-      });
-      return await res.json() as boolean;
-  }
-
-  async function createSiweMessage(statement: string) {
-      const res = await fetch(`${BACKEND_ADDR}/nonce`, {
-          credentials: 'include',
-      });
-      const SESSION_DURATION = 1000 * 60 * 60;
-      const nonce = await res.text();
-      const message = new SiweMessage({
-          expirationTime: new Date(Date.now() + SESSION_DURATION).toISOString(),
-          domain,
-          address: userAddress,
-          statement,
-          uri: origin,
-          version: '1',
-          chainId,
-          nonce
-      });
-      console.log(message);
-      return message.prepareMessage();
-  }
-
-  const { signMessageAsync } = useSignMessage()
-  const signInWithEthereum = async (): Promise<boolean | undefined> => {
-      try {
-          const message = await createSiweMessage(
-              'Connect with AI Agent',
-          );
-          console.log(message);
-          const signature = await signMessageAsync({
-              message,
-          })
-          console.log(signature);
-
-          return await sendForVerification(message, signature);
-      } catch (e) {
-          console.error(e);
       }
-  };
+    }, [isSignedIn]); // Try signing in when user is logged in
+
+    const signInWithEthereum = useSignInWithEthereum({domain, origin, chainId, userAddress});
+  
+  
 
   return (
     <Box bg="grey" width="100%" bgPosition="center" bgRepeat="no-repeat" backgroundSize="cover" display='flex' flexDirection="column" alignItems="center" margin="auto">
@@ -139,7 +103,6 @@ const Hero: React.FC = () => {
           </Box>
         </Box>
         {isConnected ? <NFT balance={balance?.toString()} id={id?.toString()}/> : null}
-        {/* {isConnected && isLoggedIn && !isSignedIn ? <Button onClick={() => signInWithEthereum() }>Sign in</Button> : null} */}
         {isConnected && isSignedIn ? <Text>Connected to AI Agent</Text> : <Text>Agent disconnected</Text>}
         <Spacer height="50px"/>
       </VStack>
