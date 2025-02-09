@@ -24,6 +24,7 @@ const Hero: React.FC = () => {
     const id = useIdOf(userAddress);
     const balance = useBalanceOf(userAddress);
     const tokenUri = useTokenUri(id);
+    console.log({id, balance, tokenUri});
 
     // if (isConnected && userAddress != undefined) {
     //   useContracts({setId, setBalance, setUrl, id, balance, url, userAddress})
