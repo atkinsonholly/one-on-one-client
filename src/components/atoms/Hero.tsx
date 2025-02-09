@@ -26,7 +26,7 @@ const Hero: React.FC = () => {
 
   return (
     <Box bg="grey" width="100%" bgPosition="center" bgRepeat="no-repeat" bgImage="brett-jordan-bZtxfALS2DA-unsplash.jpg" minHeight="900px" backgroundSize="cover" display='flex' flexDirection="column" alignItems="center" margin="auto">
-      <VStack justifyContent="center" spacing="50px">
+      <VStack justifyContent="center">
         <Box padding="25px" alignItems="center">
           <Box padding="25px">
             <Text fontSize="5xl" fontFamily="alt" color="blue" textAlign="center">

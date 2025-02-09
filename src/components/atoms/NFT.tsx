@@ -57,7 +57,7 @@ const NFT: React.FC<NFTProps> = (props) => {
             >
             {isPending ? 'Confirming...' : 'Mint NFT'}
             </Button></form>} 
-            {props.balance == 1 && <HStack><Box display="flex" flexFlow="column" alignContent="flex-start"><VStack  ><Text>{props.metadata.name}</Text><Image src={props.metadata.image} width="600px"  /></VStack></Box><Chat id={props.id}/></HStack>}
+            {props.balance == 1 && <HStack><Box display="flex" flexFlow="column" alignContent="flex-start"><VStack  ><Text fontSize="md" fontFamily="alt" color="black" textAlign="center">{props.metadata.name}</Text><Image src={props.metadata.image} width="600px"  /></VStack></Box><Chat id={props.id}/></HStack>}
         </VStack>
     </HStack>
   );
