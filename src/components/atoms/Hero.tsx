@@ -1,5 +1,5 @@
-import React, {useEffect, useState, useMemo } from "react";
-import { Text, Box, VStack, Spacer, HStack, Image } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { Text, Box, VStack, Spacer } from "@chakra-ui/react";
 import WagmiConnect from "./WagmiConnect";
 // import NFT from "./NFT";
 import { abi } from './nftAbi';
@@ -7,6 +7,7 @@ import { useAccount, useChainId, useSignMessage, useReadContract, useReadContrac
 import { Button } from "@chakra-ui/react";
 import {SiweMessage} from "siwe";
 import { Address } from 'viem';
+import { useContracts } from "../../hooks/useContracts";
 
 import dynamic from 'next/dynamic'
 
@@ -18,27 +19,16 @@ const BACKEND_ADDR = process.env.NEXT_PUBLIC_AGENT_URL;
 
 const Hero: React.FC = () => {
     const { isConnected, address: userAddress } = useAccount()
-    const [result, setResult] = useState<string>("0")
-    const [id, setId] = useState<string>("0")
-    const [balance, setBalance] = useState<string>("0")
-    // const [isLoggedIn, setLoggedIn] = useState(false);
     // const [isSignedIn, setSignedIn] = useState(false);
     const [domain, setDomain] = useState("");
     const [origin, setOrigin] = useState("");
 
     const chainId = useChainId()
+    const {id, balance, url } = useContracts()
 
     useEffect(() => {
       
-    }, [userAddress]);
-    
-    useEffect(() => {
-      // setId(result.data)
-    }, [result]);
-
-    useEffect(() => {
-      console.log(result, 'res')
-    }, [isConnected]);
+    }, [isConnected, userAddress]);
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -79,46 +69,6 @@ const Hero: React.FC = () => {
         return message.prepareMessage();
     }
 
-    const contractAddress = '0x65725931bf9d37d7e1b1ceb90928271b572829f4'
-
-    const contract = {
-      abi,
-      address: contractAddress as unknown as Address,
-    }
-
-    const loadData = async() => {
-      let res;
-      if (userAddress) {
-        res = useReadContracts({
-          contracts: [
-            {
-              ...contract,
-              functionName: 'idOf',
-              args: [userAddress],
-            },
-            {
-              ...contract,
-              functionName: 'balanceOf',
-              args: [userAddress],
-            },
-            {
-              ...contract,
-              functionName: 'tokenURI',
-              args: [BigInt(id)],
-            }]
-        })
-      }
-      console.log(res, 'inside')
-      return res;
-    }
-
-    console.log("loading data")
-    loadData().then((result: any) => {
-      if (result) {
-        setResult(result.data);
-        console.log(result, 'result')
-      }
-    }).catch(console.error);
 
     // useEffect(() => {
     //     const signIn = async () => {
@@ -187,7 +137,7 @@ const Hero: React.FC = () => {
             <WagmiConnect/>
           </Box>
         </Box>
-        {isConnected ? <NFT balance={balance} id={id}/> : null}
+        {isConnected ? <NFT balance={balance?.toString()} id={id?.toString()}/> : null}
         {/* {isConnected && isLoggedIn && !isSignedIn ? <Button onClick={() => signInWithEthereum() }>Sign in</Button> : null} */}
         {/* {isConnected && isSignedIn ? <Text>Connected to AI Agent</Text> : <Text>Agent disconnected</Text>} */}
         <Spacer height="50px"/>

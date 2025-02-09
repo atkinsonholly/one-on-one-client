@@ -4,8 +4,8 @@ import { parseEther } from 'viem'
 import { abi } from './nftAbi';
 
 interface NFTProps {
-    balance: string;
-    id: string;
+    balance: string | undefined;
+    id: string | undefined;
   }
 
 const NFT: React.FC<NFTProps> = ({ balance, id }) => {
