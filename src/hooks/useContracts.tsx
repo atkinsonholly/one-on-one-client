@@ -3,12 +3,8 @@ import { useAccount, useReadContracts } from 'wagmi'
 import { Address } from 'viem';
 import { abi } from '../components/atoms/nftAbi';
 
-const useContracts = () => {
+const useContracts = (props: any) => {
     const { address: userAddress } = useAccount()
-
-    const [id, setId] = useState<number>(0)
-    const [balance, setBalance] = useState<number>(0)
-    const [url, setUrl] = useState<string>("")
     
     const contractAddress = '0x65725931bf9d37d7e1b1ceb90928271b572829f4'
 
@@ -33,26 +29,19 @@ const useContracts = () => {
                 {
                 ...contract,
                 functionName: 'tokenURI',
-                args: [BigInt(id || 0)],
+                args: [BigInt(props.id || 0)],
                 }]
         })
     
         contracts().then(result => {
             if (result.data && result.data.length) {
-                result.data[0].result ? setId(Number(result.data[0].result)) : null
-                result.data[1].result ? setBalance(Number(result.data[1].result)) : null
-                result.data[2].result ? setUrl(result.data[2].result) : null
+                result.data[0].result && Number(result.data[0].result) != 0 && Number(result.data[0].result) != props.id ? props.setId(Number(result.data[0].result)) : null
+                result.data[1].result && Number(result.data[1].result) != props.balance ? props.setBalance(Number(result.data[1].result)) : null
+                result.data[2].result && Number(result.data[1].result) == 1 && result.data[2].result != props.url ? props.setUrl(result.data[2].result) : null
             }
         })
     } catch(error) {
         console.log(error)
-    }
-    console.log(id, balance, url)
-    
-    return {
-        id: id,
-        balance: balance,
-        url: url
     }
 };
 

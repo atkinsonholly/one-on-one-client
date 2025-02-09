@@ -19,16 +19,19 @@ const BACKEND_ADDR = process.env.NEXT_PUBLIC_AGENT_URL;
 
 const Hero: React.FC = () => {
     const { isConnected, address: userAddress } = useAccount()
-    // const [isSignedIn, setSignedIn] = useState(false);
+    const [isSignedIn, setSignedIn] = useState(false);
     const [domain, setDomain] = useState("");
     const [origin, setOrigin] = useState("");
+    const [id, setId] = useState<number>(0)
+    const [balance, setBalance] = useState<number>(0)
+    const [url, setUrl] = useState<string>("")
 
     const chainId = useChainId()
-    const {id, balance, url } = useContracts()
+    useContracts({setId, setBalance, setUrl, id, balance, url})
 
     useEffect(() => {
       
-    }, [isConnected, userAddress]);
+    }, [isConnected, userAddress, id, balance, url]);
 
     useEffect(() => {
         if (typeof window !== "undefined") {
@@ -37,92 +40,90 @@ const Hero: React.FC = () => {
         }
       }, []);
 
+    useEffect(() => {
+        const signIn = async () => {
+            try {
+                const res = await fetch(`${BACKEND_ADDR}/is-signed-in`, {
+                    credentials: 'include',
+                });
+
+                const alreadySignedIn = await res.json();
+
+                if (alreadySignedIn) {
+                    setSignedIn(true);
+                } else {
+                    let success = await signInWithEthereum();
+                    if (success) {
+                        const res = await fetch(`${BACKEND_ADDR}/is-signed-in`, {
+                            credentials: 'include',
+                        });
+                        console.log("signed", res)
+                        setSignedIn(true);
+                    } else {
+                        console.error("Failed to sign in");
+                    }
+                }
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+
+        if (isConnected && !isSignedIn) {
+            signIn()
+                .catch(console.error);
+        }
+    }, [isConnected, isSignedIn]); // Try signing in when user is logged in
+
     async function sendForVerification(message: string, signature: string): Promise<boolean> {
-        const res = await fetch(`${BACKEND_ADDR}/verify`, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ message, signature }),
-            credentials: 'include',
-        });
-        return await res.json() as boolean;
-    }
+      const res = await fetch(`${BACKEND_ADDR}/verify`, {
+          method: "POST",
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ message, signature }),
+          credentials: 'include',
+      });
+      return await res.json() as boolean;
+  }
 
-    async function createSiweMessage(statement: string) {
-        const res = await fetch(`${BACKEND_ADDR}/nonce`, {
-            credentials: 'include',
-        });
-        const SESSION_DURATION = 1000 * 60 * 60;
-        const nonce = await res.text();
-        const message = new SiweMessage({
-            expirationTime: new Date(Date.now() + SESSION_DURATION).toISOString(),
-            domain,
-            address,
-            statement,
-            uri: origin,
-            version: '1',
-            chainId,
-            nonce
-        });
-        console.log(message);
-        return message.prepareMessage();
-    }
+  async function createSiweMessage(statement: string) {
+      const res = await fetch(`${BACKEND_ADDR}/nonce`, {
+          credentials: 'include',
+      });
+      const SESSION_DURATION = 1000 * 60 * 60;
+      const nonce = await res.text();
+      const message = new SiweMessage({
+          expirationTime: new Date(Date.now() + SESSION_DURATION).toISOString(),
+          domain,
+          address: userAddress,
+          statement,
+          uri: origin,
+          version: '1',
+          chainId,
+          nonce
+      });
+      console.log(message);
+      return message.prepareMessage();
+  }
 
+  const { signMessageAsync } = useSignMessage()
+  const signInWithEthereum = async (): Promise<boolean | undefined> => {
+      try {
+          const message = await createSiweMessage(
+              'Connect with AI Agent',
+          );
+          console.log(message);
+          const signature = await signMessageAsync({
+              message,
+          })
+          console.log(signature);
 
-    // useEffect(() => {
-    //     const signIn = async () => {
-    //         try {
-    //             const res = await fetch(`${BACKEND_ADDR}/is-signed-in`, {
-    //                 credentials: 'include',
-    //             });
-
-    //             const alreadySignedIn = await res.json();
-
-    //             if (alreadySignedIn) {
-    //                 setSignedIn(true);
-    //             } else {
-    //                 let success = await signInWithEthereum();
-    //                 if (success) {
-    //                     const res = await fetch(`${BACKEND_ADDR}/is-signed-in`, {
-    //                         credentials: 'include',
-    //                     });
-    //                     console.log("signed", res)
-    //                     setSignedIn(true);
-    //                 } else {
-    //                     console.error("Failed to sign in");
-    //                 }
-    //             }
-
-    //         } catch (e) {
-    //             console.error(e);
-    //         }
-    //     }
-
-    //     if (isConnected && !isSignedIn) {
-    //         signIn()
-    //             .catch(console.error);
-    //     }
-    // }, [isConnected, isSignedIn]); // Try signing in when user is logged in
-
-
-    // const { signMessageAsync } = useSignMessage()
-    // const signInWithEthereum = async (): Promise<boolean | undefined> => {
-    //     try {
-    //         const message = await createSiweMessage(
-    //             'Connect with AI Agent',
-    //         );
-    //         console.log(message);
-    //         const signature = await signMessageAsync({
-    //             message,
-    //         })
-    //         console.log(signature);
-
-    //         return await sendForVerification(message, signature);
-    //     } catch (e) {
-    //         console.error(e);
-    //     }
-    // };
+          return await sendForVerification(message, signature);
+      } catch (e) {
+          console.error(e);
+      }
+  };
 
   return (
     <Box bg="grey" width="100%" bgPosition="center" bgRepeat="no-repeat" backgroundSize="cover" display='flex' flexDirection="column" alignItems="center" margin="auto">
@@ -139,7 +140,7 @@ const Hero: React.FC = () => {
         </Box>
         {isConnected ? <NFT balance={balance?.toString()} id={id?.toString()}/> : null}
         {/* {isConnected && isLoggedIn && !isSignedIn ? <Button onClick={() => signInWithEthereum() }>Sign in</Button> : null} */}
-        {/* {isConnected && isSignedIn ? <Text>Connected to AI Agent</Text> : <Text>Agent disconnected</Text>} */}
+        {isConnected && isSignedIn ? <Text>Connected to AI Agent</Text> : <Text>Agent disconnected</Text>}
         <Spacer height="50px"/>
       </VStack>
     </Box>
