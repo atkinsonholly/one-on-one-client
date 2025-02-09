@@ -48,7 +48,7 @@ const NFT: React.FC<NFTProps> = (props) => {
   return (
     <HStack justifyContent="space-between" alignItems="flex-start">
         <VStack minHeight="600px" justify="flex-start">
-            {props.balance == 0 ?
+            {props.balance == 0 &&
             <form onSubmit={submit}>
             <Button
             color="blue" bg="green" fontSize="18px" fontFamily="alt" width='260px'
@@ -56,8 +56,8 @@ const NFT: React.FC<NFTProps> = (props) => {
             type="submit"
             >
             {isPending ? 'Confirming...' : 'Mint NFT'}
-            </Button></form> : <Box><Image src='OneOnOne_square.webp' width="400px" /></Box>}
-            {/* Update to fetch user's NFT image */}
+            </Button></form>} 
+            {props.balance == 1 && <HStack><Box display="flex" flexFlow="column" alignContent="flex-start"><VStack  ><Text>{props.metadata.name}</Text><Image src={props.metadata.image} width="600px"  /></VStack></Box><Chat id={props.id}/></HStack>}
         </VStack>
     </HStack>
   );
