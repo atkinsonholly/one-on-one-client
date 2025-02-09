@@ -16,20 +16,12 @@ const NFT = dynamic(() => import("@/components/atoms/NFT"));
 
 const Hero: React.FC = () => {
     const { isConnected, address: userAddress } = useAccount()
-    // const [id, setId] = useState<number>(0)
-    // const [balance, setBalance] = useState<number>(0)
-    // const [url, setUrl] = useState<string>("")
-    const [metadata, setMetadata] = useState<string>("")
 
     const id = useIdOf(userAddress);
     const balance = useBalanceOf(userAddress);
     const tokenUri = useTokenUri(id);
-    console.log({id, balance, tokenUri});
-
-    // if (isConnected && userAddress != undefined) {
-    //   useContracts({setId, setBalance, setUrl, id, balance, url, userAddress})
-    //   useMetadata({setMetadata, id, userAddress})
-    // }
+    const metadata = useMetadata(id, userAddress);
+    console.log({id, balance, tokenUri, metadata});
 
     const isSignedIn = useSignInWithEthereum(isConnected, userAddress);
 
