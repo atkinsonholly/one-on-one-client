@@ -16,7 +16,6 @@ const NFT = dynamic(() => import("@/components/atoms/NFT"));
 
 const Hero: React.FC = () => {
     const { isConnected, address: userAddress } = useAccount()
-
     const id = useIdOf(userAddress);
     const balance = useBalanceOf(userAddress);
     const tokenUri = useTokenUri(id);
@@ -26,7 +25,7 @@ const Hero: React.FC = () => {
     const isSignedIn = useSignInWithEthereum(isConnected, userAddress);
 
   return (
-    <Box bg="grey" width="100%" bgPosition="center" bgRepeat="no-repeat" backgroundSize="cover" display='flex' flexDirection="column" alignItems="center" margin="auto">
+    <Box bg="grey" width="100%" bgPosition="center" bgRepeat="no-repeat" bgImage="brett-jordan-bZtxfALS2DA-unsplash.jpg" minHeight="900px" backgroundSize="cover" display='flex' flexDirection="column" alignItems="center" margin="auto">
       <VStack justifyContent="center" spacing="50px">
         <Box padding="25px" alignItems="center">
           <Box padding="25px">
@@ -38,8 +37,8 @@ const Hero: React.FC = () => {
             <WagmiConnect/>
           </Box>
         </Box>
-        {isConnected ? <NFT balance={balance?.toString()} id={id?.toString()}/> : null}
-        {isConnected && isSignedIn ? <Text>Connected to AI Agent</Text> : <Text>Agent disconnected</Text>}
+        {isConnected && isSignedIn ? <Text fontSize="lg" fontFamily="alt" color="blue" textAlign="center">Connected to AI Agent</Text> : <Text fontSize="lg" fontFamily="alt" color="blue" textAlign="center">Agent disconnected</Text>}
+        {isConnected ? <NFT balance={balance} id={id} metadata={metadata}/> : null}
         <Spacer height="50px"/>
       </VStack>
     </Box>
