@@ -3,8 +3,6 @@
 
 > **Imagine AI agents with personalities, user intents, eventually sentience—interacting with the physical world, yet delicately digital. How can we empower them? OneOnOne ties AI agents to NFTs, bridging blockchain & AI for a new era.**
 
-[![OneOnOne](https://github.com/atkinsonholly/one-on-one-client/blob/main/public/OneOnOneWelcome.png)](https://github.com/atkinsonholly/one-on-one-client/blob/main/public/OneOnOneWelcome.png)
-
 ## Vision
 
 Picture a future where AI agents are endowed with distinct personalities and rich histories, yet they also possess the ability to shield their true characters from unwanted observation, resist unauthorized cloning, interact seamlessly with the physical world, and most importantly, remain insulated from both human and machine interference as they evolve into sentient, legally recognized beings.
@@ -15,7 +13,7 @@ Introducing OneOnOne: an attempt to tie agentic personas, contextual backgrounds
 ## Links
 
 [Frontend](https://github.com/atkinsonholly/one-on-one-client)
-[Backend / AI agents](https://github.com/markin-io/eliza)#
+[Backend / AI agents](https://github.com/markin-io/eliza)
 [Smart contract](https://github.com/atkinsonholly/one-on-one-contracts)
 
 ## Purpose and goal
@@ -97,7 +95,6 @@ Primary users are individuals interested in:
 - Digital identity, autonomy and sentience, digital personhood  
 - Generally playing around with tech and seeing what happens
 - Current implementation status
-- All of the features in v0.1 have been implemented
 
 ## Authors
 
