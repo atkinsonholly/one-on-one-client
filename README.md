@@ -54,7 +54,7 @@ Autonomous Agentic NFTs MUST:
 - Be connected to a centralised web UI through the owner’s wallet
 - Be used to initialise a unique, dedicated centralised ElizaOS agent (only if the wallet is connected)
 - Be chatted to, privately, and with SignInWithEthereum authentication through a simple web UI
-Retain the context from previous chats- 
+- Retain the context from previous chats
 
 ### v0.2: MVP
 
