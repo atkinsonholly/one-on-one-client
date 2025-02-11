@@ -16,10 +16,9 @@ const useMetadata = (id: any, userAddress: any) => {
 
     interface Metadata {
         name: string;
-        image: { cachedUrl: ""}
+        image: { cachedUrl: string }
     }
     const [metadata, setMetadata] = useState<Metadata>({name: "", image: { cachedUrl: ""}})
-    const [agent, setAgent] = useState<string>("")
 
     useEffect(() => {
         // use Alchemy for regular cached metadata
@@ -41,12 +40,7 @@ const useMetadata = (id: any, userAddress: any) => {
         if (typeof id != 'undefined' && userAddress) {
             getMetadata()
                 .then((result) => {
-                    if (result.data != undefined && result.data.length) {
-                        console.log(result, "result")
-                        console.log(result.name, "result")
-                        console.log(result.image.cachedUrl, "result")
-                        setMetadata({name: result.name, image: {cachedUrl: result.image.cachedUrl}})
-                    }
+                    setMetadata({name: result.name, image: {cachedUrl: result.image.cachedUrl}})
                 })
                 .catch((error) => {
                     console.log(error);
