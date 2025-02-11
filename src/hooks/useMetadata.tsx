@@ -2,8 +2,6 @@ import {useEffect, useState} from "react";
 
 const { Network, Alchemy } = require("alchemy-sdk");
 
-console.log(Network, 'network')
-
 const settings = {
     apiKey: process.env.NEXT_PUBLIC_BASE_ID,
     network: Network.BASE_MAINNET
@@ -18,6 +16,7 @@ const useMetadata = (id: any, userAddress: any) => {
         name: string;
         image: { cachedUrl: string }
     }
+
     const [metadata, setMetadata] = useState<Metadata>({name: "", image: { cachedUrl: ""}})
 
     useEffect(() => {
@@ -28,7 +27,6 @@ const useMetadata = (id: any, userAddress: any) => {
                     contractAddress,
                     id
                 );
-                console.log(res, 'res')
                 return res;
 
             } catch (error) {

@@ -9,7 +9,6 @@ const useAgent = (id: any, userAddress: any) => {
         const getAgentId = async () => {
             try {
                 const response = await fetch(`https://bafybeigulu7dxyhub5fqfphj22abatnaovo7oq5kvlsuig7m7m7la6ftpa.ipfs.w3s.link/${id}.json`);
-                console.log(response)
                 return response;
                 
             } catch (error) {
@@ -22,8 +21,6 @@ const useAgent = (id: any, userAddress: any) => {
             .then(async (result) => {
                 if (result) {
                     const jsonMetadata = await result.json();
-                    console.log("\nJSON Metadata:");
-                    console.log(JSON.stringify(jsonMetadata, null, 2));
                     setAgent(jsonMetadata.agent_id)
                 }
             })

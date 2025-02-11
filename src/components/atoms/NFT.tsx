@@ -6,7 +6,7 @@ import Chat from "./Chat";
 
 interface Metadata {
     name: string;
-    image: { cachedUrl: ""};
+    image: { cachedUrl: string }
 }
 
 interface NFTProps {
@@ -19,8 +19,7 @@ interface NFTProps {
 const NFT: React.FC<NFTProps> = (props) => {
 
   const { address: userAddress } = useAccount();
-  const { data: hash, isPending, writeContract } = useWriteContract()
-  //  const config = useConfig();
+  const { isPending, writeContract } = useWriteContract()
   const chainId = useChainId();
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
@@ -28,11 +27,7 @@ const NFT: React.FC<NFTProps> = (props) => {
         console.error('User address is not defined');
         return;
       }
-    console.log(userAddress);
-    console.log(chainId)
     e.preventDefault()
-    console.log(abi)
-    console.log(props.metadata)
     // const formData = new FormData(e.target as HTMLFormElement)
     writeContract({
         abi,

@@ -1,8 +1,7 @@
 'use client'
-import React, { useState } from "react";
-import { Text, Box, VStack, Spacer, Button } from "@chakra-ui/react";
+import React from "react";
+import { Text, Box, VStack, Spacer } from "@chakra-ui/react";
 import WagmiConnect from "./WagmiConnect";
-// import NFT from "./NFT";
 import { useAccount  } from 'wagmi'
 import {useBalanceOf, useIdOf, useTokenUri} from "../../hooks/useContracts";
 import { useMetadata } from "../../hooks/useMetadata";
@@ -22,8 +21,6 @@ const Hero: React.FC = () => {
     const tokenUri = useTokenUri(id);
     const metadata = useMetadata(id, userAddress);
     const agent = useAgent(id, userAddress)
-
-    console.log({id, balance, tokenUri, metadata, agent});
 
     const isSignedIn = useSignInWithEthereum(isConnected, userAddress);
 
