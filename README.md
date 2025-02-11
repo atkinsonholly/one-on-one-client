@@ -60,7 +60,7 @@ Autonomous Agentic NFTs MUST:
 
 Autonomous Agentic NFTs MUST:
 
-- Transact on blockchain networks using token-bound accounts (ERC-6551) 
+- Transact on blockchain networks using token-bound accounts (ERC-6551)
 - Engage with individuals using messaging apps (e.g. WhatsApp, TG)
 - Build communities using social media (e.g. Twitter, Farcaster)
 - Protect their identity by storing their character files and context in a way that is private and decentralised (i.e. can only be read by the NFT itself or the owner of the NFT)
@@ -94,7 +94,6 @@ Primary users are individuals interested in:
 - Blockchain and NFT innovation
 - Digital identity, autonomy and sentience, digital personhood  
 - Generally playing around with tech and seeing what happens
-- Current implementation status
 
 ## Authors
 
