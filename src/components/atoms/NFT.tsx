@@ -1,18 +1,25 @@
-import { Button, HStack, VStack, Image, Box } from '@chakra-ui/react';
+import { Button, HStack, VStack, Image, Box, Text } from '@chakra-ui/react';
 import { useAccount, useWriteContract, useConfig, useChainId } from 'wagmi';
 import { parseEther } from 'viem'
 import { abi } from './nftAbi';
+import Chat from "./Chat";
+
+interface Metadata {
+    name: string;
+    image: { cachedUrl: string }
+}
 
 interface NFTProps {
-    balance?: string;
-    id?: string;
-  }
+    balance: BigInt | undefined;
+    id: BigInt | undefined;
+    metadata: Metadata;
+    agent: string;
+}
 
-const NFT: React.FC<NFTProps> = ({ balance, id }) => {
+const NFT: React.FC<NFTProps> = (props) => {
 
   const { address: userAddress } = useAccount();
-  const { data: hash, isPending, writeContract } = useWriteContract()
-  //  const config = useConfig();
+  const { isPending, writeContract } = useWriteContract()
   const chainId = useChainId();
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
@@ -20,10 +27,7 @@ const NFT: React.FC<NFTProps> = ({ balance, id }) => {
         console.error('User address is not defined');
         return;
       }
-    console.log(userAddress);
-    console.log(chainId)
     e.preventDefault()
-    console.log(abi)
     // const formData = new FormData(e.target as HTMLFormElement)
     writeContract({
         abi,
@@ -41,7 +45,7 @@ const NFT: React.FC<NFTProps> = ({ balance, id }) => {
   return (
     <HStack justifyContent="space-between" alignItems="flex-start">
         <VStack minHeight="600px" justify="flex-start">
-            {balance == "0" ?
+            {props.balance == BigInt(0) &&
             <form onSubmit={submit}>
             <Button
             color="blue" bg="green" fontSize="18px" fontFamily="alt" width='260px'
@@ -49,8 +53,8 @@ const NFT: React.FC<NFTProps> = ({ balance, id }) => {
             type="submit"
             >
             {isPending ? 'Confirming...' : 'Mint NFT'}
-            </Button></form> : <Box><Image src='OneOnOne_square.webp' width="400px" /></Box>}
-            {/* Update to fetch user's NFT image */}
+            </Button></form>} 
+            {props.balance == BigInt(1) && props.id && <HStack><Box display="flex" flexFlow="column" alignContent="flex-start"><VStack  ><Text fontSize="md" fontFamily="alt" color="black" textAlign="center">{props.metadata.name}</Text><Image src={props.metadata.image.cachedUrl} width="600px"  /></VStack></Box><Chat id={Number(props.id)} agent={props.agent}/></HStack>}
         </VStack>
     </HStack>
   );
