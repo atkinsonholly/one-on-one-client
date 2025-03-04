@@ -1,12 +1,12 @@
-import React, {useEffect, useState, useMemo } from "react";
-import { Text, Box, VStack, Spacer, HStack, Image } from "@chakra-ui/react";
+'use client'
+import React from "react";
+import { Text, Box, VStack, Spacer } from "@chakra-ui/react";
 import WagmiConnect from "./WagmiConnect";
-// import NFT from "./NFT";
-import { abi } from './nftAbi';
-import { useAccount, useChainId, useSignMessage, useReadContract, useReadContracts } from 'wagmi'
-import { Button } from "@chakra-ui/react";
-import {SiweMessage} from "siwe";
-import { Address } from 'viem';
+import { useAccount  } from 'wagmi'
+import {useBalanceOf, useIdOf, useTokenUri} from "../../hooks/useContracts";
+import { useMetadata } from "../../hooks/useMetadata";
+import { useAgent } from "../../hooks/useAgent";
+import { useSignInWithEthereum } from "../../hooks/useSignInWithEthereum";
 
 import dynamic from 'next/dynamic'
 
@@ -14,169 +14,19 @@ import dynamic from 'next/dynamic'
 // const SignIn = dynamic(() => import("@/components/atoms/SignIn"));
 const NFT = dynamic(() => import("@/components/atoms/NFT"));
 
-const BACKEND_ADDR = process.env.NEXT_PUBLIC_AGENT_URL;
-
 const Hero: React.FC = () => {
     const { isConnected, address: userAddress } = useAccount()
-    const [result, setResult] = useState<string>("0")
-    const [id, setId] = useState<string>("0")
-    const [balance, setBalance] = useState<string>("0")
-    // const [isLoggedIn, setLoggedIn] = useState(false);
-    // const [isSignedIn, setSignedIn] = useState(false);
-    const [domain, setDomain] = useState("");
-    const [origin, setOrigin] = useState("");
+    const id = useIdOf(userAddress);
+    const balance = useBalanceOf(userAddress);
+    const tokenUri = useTokenUri(id);
+    const metadata = useMetadata(id, userAddress);
+    const agent = useAgent(id, userAddress)
 
-    const chainId = useChainId()
-
-    useEffect(() => {
-      
-    }, [userAddress]);
-    
-    useEffect(() => {
-      // setId(result.data)
-    }, [result]);
-
-    useEffect(() => {
-      console.log(result, 'res')
-    }, [isConnected]);
-
-    useEffect(() => {
-        if (typeof window !== "undefined") {
-          setDomain(window.location.host);
-          setOrigin(window.location.origin);
-        }
-      }, []);
-
-    async function sendForVerification(message: string, signature: string): Promise<boolean> {
-        const res = await fetch(`${BACKEND_ADDR}/verify`, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ message, signature }),
-            credentials: 'include',
-        });
-        return await res.json() as boolean;
-    }
-
-    async function createSiweMessage(statement: string) {
-        const res = await fetch(`${BACKEND_ADDR}/nonce`, {
-            credentials: 'include',
-        });
-        const SESSION_DURATION = 1000 * 60 * 60;
-        const nonce = await res.text();
-        const message = new SiweMessage({
-            expirationTime: new Date(Date.now() + SESSION_DURATION).toISOString(),
-            domain,
-            address,
-            statement,
-            uri: origin,
-            version: '1',
-            chainId,
-            nonce
-        });
-        console.log(message);
-        return message.prepareMessage();
-    }
-
-    const contractAddress = '0x65725931bf9d37d7e1b1ceb90928271b572829f4'
-
-    const contract = {
-      abi,
-      address: contractAddress as unknown as Address,
-    }
-
-    const loadData = async() => {
-      let res;
-      if (userAddress) {
-        res = useReadContracts({
-          contracts: [
-            {
-              ...contract,
-              functionName: 'idOf',
-              args: [userAddress],
-            },
-            {
-              ...contract,
-              functionName: 'balanceOf',
-              args: [userAddress],
-            },
-            {
-              ...contract,
-              functionName: 'tokenURI',
-              args: [BigInt(id)],
-            }]
-        })
-      }
-      console.log(res, 'inside')
-      return res;
-    }
-
-    console.log("loading data")
-    loadData().then((result: any) => {
-      if (result) {
-        setResult(result.data);
-        console.log(result, 'result')
-      }
-    }).catch(console.error);
-
-    // useEffect(() => {
-    //     const signIn = async () => {
-    //         try {
-    //             const res = await fetch(`${BACKEND_ADDR}/is-signed-in`, {
-    //                 credentials: 'include',
-    //             });
-
-    //             const alreadySignedIn = await res.json();
-
-    //             if (alreadySignedIn) {
-    //                 setSignedIn(true);
-    //             } else {
-    //                 let success = await signInWithEthereum();
-    //                 if (success) {
-    //                     const res = await fetch(`${BACKEND_ADDR}/is-signed-in`, {
-    //                         credentials: 'include',
-    //                     });
-    //                     console.log("signed", res)
-    //                     setSignedIn(true);
-    //                 } else {
-    //                     console.error("Failed to sign in");
-    //                 }
-    //             }
-
-    //         } catch (e) {
-    //             console.error(e);
-    //         }
-    //     }
-
-    //     if (isConnected && !isSignedIn) {
-    //         signIn()
-    //             .catch(console.error);
-    //     }
-    // }, [isConnected, isSignedIn]); // Try signing in when user is logged in
-
-
-    // const { signMessageAsync } = useSignMessage()
-    // const signInWithEthereum = async (): Promise<boolean | undefined> => {
-    //     try {
-    //         const message = await createSiweMessage(
-    //             'Connect with AI Agent',
-    //         );
-    //         console.log(message);
-    //         const signature = await signMessageAsync({
-    //             message,
-    //         })
-    //         console.log(signature);
-
-    //         return await sendForVerification(message, signature);
-    //     } catch (e) {
-    //         console.error(e);
-    //     }
-    // };
+    const isSignedIn = useSignInWithEthereum(isConnected, userAddress);
 
   return (
-    <Box bg="grey" width="100%" bgPosition="center" bgRepeat="no-repeat" backgroundSize="cover" display='flex' flexDirection="column" alignItems="center" margin="auto">
-      <VStack justifyContent="center" spacing="50px">
+    <Box bg="grey" width="100%" bgPosition="center" bgRepeat="no-repeat" bgImage="brett-jordan-bZtxfALS2DA-unsplash.jpg" minHeight="900px" backgroundSize="cover" display='flex' flexDirection="column" alignItems="center" margin="auto">
+      <VStack justifyContent="center">
         <Box padding="25px" alignItems="center">
           <Box padding="25px">
             <Text fontSize="5xl" fontFamily="alt" color="blue" textAlign="center">
@@ -187,9 +37,8 @@ const Hero: React.FC = () => {
             <WagmiConnect/>
           </Box>
         </Box>
-        {isConnected ? <NFT balance={balance} id={id}/> : null}
-        {/* {isConnected && isLoggedIn && !isSignedIn ? <Button onClick={() => signInWithEthereum() }>Sign in</Button> : null} */}
-        {/* {isConnected && isSignedIn ? <Text>Connected to AI Agent</Text> : <Text>Agent disconnected</Text>} */}
+        {isConnected && isSignedIn ? <Text fontSize="lg" fontFamily="alt" color="blue" textAlign="center">Connected to AI Agent</Text> : <Text fontSize="lg" fontFamily="alt" color="blue" textAlign="center">Agent disconnected</Text>}
+        {isConnected && balance == BigInt(1) ? <NFT balance={balance} id={id} metadata={metadata} agent={agent}/> : null}
         <Spacer height="50px"/>
       </VStack>
     </Box>
