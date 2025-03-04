@@ -13,7 +13,7 @@ const Footer: React.FC = () => (
      <a target="_blank" href="https://github.com/atkinsonholly/one-on-one-client">Frontend</a>
       </Button>
       <Button leftIcon={<FaGithub />} fontSize="12px" fontFamily="alt" width='120px'>
-     <a target="_blank" href="https://github.com/markin-io">Agent</a>
+     <a target="_blank" href="https://github.com/markin-io/eliza">Agent</a>
       </Button>
       </ButtonGroup>
       </Center>
